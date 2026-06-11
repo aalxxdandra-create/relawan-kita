@@ -22,28 +22,31 @@
     </div>
 </div>
 
-<div class="bg-white rounded-2xl shadow-sm border">
+<div class="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
     {{-- HEADER --}}
-    <div class="p-6 border-b flex items-center justify-between">
-        <h2 class="text-lg font-bold text-gray-800">Daftar Semua Event</h2>
-        <a href="{{ route('admin.events.create') }}" class="bg-blue-600 text-white px-5 py-2 rounded-xl font-semibold hover:bg-blue-700 transition text-sm flex items-center gap-2">
+    <div class="p-8 border-b border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">Daftar Semua Event</h2>
+            <p class="text-sm text-gray-500 mt-1">Kelola event dan lihat status persetujuan dengan mudah.</p>
+        </div>
+        <a href="{{ route('admin.events.create') }}" class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-2xl font-semibold hover:bg-blue-700 transition text-sm shadow-sm">
             <i class="fas fa-plus"></i> Tambah Event
         </a>
     </div>
 
     {{-- FILTER --}}
-    <div class="p-6 border-b">
-        <form method="GET" class="flex flex-col md:flex-row gap-3">
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari event..." class="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm">
-            <select name="status" class="px-4 py-2 border border-gray-300 rounded-xl text-sm outline-none">
+    <div class="p-8 border-b border-gray-100">
+        <form method="GET" class="flex flex-col sm:flex-row sm:items-center gap-4">
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari event..." class="flex-1 px-5 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none text-sm text-gray-700">
+            <select name="status" class="w-full max-w-xs px-5 py-3 border border-gray-300 rounded-2xl text-sm text-gray-700 outline-none">
                 <option value="">Semua Status</option>
                 <option value="approved" {{ request('status')=='approved'?'selected':'' }}>Approved</option>
                 <option value="pending" {{ request('status')=='pending'?'selected':'' }}>Pending</option>
                 <option value="rejected" {{ request('status')=='rejected'?'selected':'' }}>Rejected</option>
             </select>
-            <button type="submit" class="bg-gray-800 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-gray-700 transition">Filter</button>
+            <button type="submit" class="bg-gray-900 text-white px-6 py-3 rounded-2xl text-sm font-semibold hover:bg-gray-800 transition shadow-sm">Filter</button>
             @if(request()->hasAny(['search','status','category']))
-                <a href="{{ route('admin.events.index') }}" class="bg-gray-100 text-gray-700 px-5 py-2 rounded-xl text-sm font-semibold hover:bg-gray-200 transition">Reset</a>
+                <a href="{{ route('admin.events.index') }}" class="inline-flex items-center justify-center bg-gray-100 text-gray-700 px-6 py-3 rounded-2xl text-sm font-semibold hover:bg-gray-200 transition">Reset</a>
             @endif
         </form>
     </div>
