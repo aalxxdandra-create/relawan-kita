@@ -45,8 +45,14 @@ class AdminEventController extends Controller {
             'event_time'   => 'required',
             'organizer'    => 'required|string|max:255',
             'requirements' => 'nullable|string',
-            'image_url'    => 'nullable|url|max:500',
+            'image'        => 'nullable|image|max:2048',
         ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('events', 'public');
+            $validated['image_url'] = asset('storage/' . $path);
+        }
+
         $validated['user_id'] = auth()->id();
         $validated['status']  = 'approved';
         Event::create($validated);
@@ -65,9 +71,15 @@ class AdminEventController extends Controller {
             'event_time'   => 'required',
             'organizer'    => 'required|string|max:255',
             'requirements' => 'nullable|string',
-            'image_url'    => 'nullable|url|max:500',
+            'image'        => 'nullable|image|max:2048',
             'status'       => 'required|in:pending,approved,rejected',
         ]);
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('events', 'public');
+            $validated['image_url'] = asset('storage/' . $path);
+        }
+
         $event->update($validated);
         return redirect()->route('admin.events.show',$event)->with('success','Event berhasil diperbarui!');
     }

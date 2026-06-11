@@ -10,7 +10,7 @@
                 @foreach($errors->all() as $e)<p class="text-sm text-red-700">{{ $e }}</p>@endforeach
             </div>
         @endif
-        <form method="POST" action="{{ route('admin.events.store') }}" class="space-y-5">
+        <form method="POST" action="{{ route('admin.events.store') }}" enctype="multipart/form-data" class="space-y-5">
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
@@ -54,8 +54,8 @@
                 <textarea name="requirements" rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm">{{ old('requirements') }}</textarea>
             </div>
             <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1">URL Gambar</label>
-                <input type="url" name="image_url" value="{{ old('image_url') }}" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="https://...">
+                <label class="block text-sm font-bold text-gray-700 mb-1">Upload Gambar Event</label>
+                <input type="file" name="image" accept="image/*" class="w-full text-sm text-gray-700 border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
             <div class="flex gap-3 pt-2">
                 <button type="submit" class="bg-blue-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition text-sm">

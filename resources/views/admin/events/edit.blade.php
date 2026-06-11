@@ -10,7 +10,7 @@
                 @foreach($errors->all() as $e)<p class="text-sm text-red-700">{{ $e }}</p>@endforeach
             </div>
         @endif
-        <form method="POST" action="{{ route('admin.events.update', $event) }}" class="space-y-5">
+        <form method="POST" action="{{ route('admin.events.update', $event) }}" enctype="multipart/form-data" class="space-y-5">
             @csrf @method('PUT')
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
@@ -53,9 +53,15 @@
                 <textarea name="requirements" rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm">{{ old('requirements', $event->requirements) }}</textarea>
             </div>
             <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1">URL Gambar</label>
-                <input type="url" name="image_url" value="{{ old('image_url', $event->image_url) }}" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                <label class="block text-sm font-bold text-gray-700 mb-1">Upload Gambar Baru</label>
+                <input type="file" name="image" accept="image/*" class="w-full text-sm text-gray-700 border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
+            @if($event->image_url)
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Gambar Saat Ini</label>
+                    <img src="{{ $event->image_url }}" alt="{{ $event->title }}" class="w-full h-56 object-cover rounded-2xl border border-gray-200">
+                </div>
+            @endif
             <div>
                 <label class="block text-sm font-bold text-gray-700 mb-1">Status</label>
                 <select name="status" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm">
