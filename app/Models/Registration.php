@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Registration extends Model {
     use HasFactory;
-    protected $fillable = ['event_id','name','email','phone'];
+    protected $fillable = ['event_id','name','email','phone','status'];
     public function event() { return $this->belongsTo(Event::class); }
 }

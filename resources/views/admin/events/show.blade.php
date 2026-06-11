@@ -44,7 +44,9 @@
                             <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Nama</th>
                             <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Email</th>
                             <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">No HP</th>
+                            <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Status</th>
                             <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Waktu</th>
+                            <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Aksi</th>
                         </tr></thead>
                         <tbody class="divide-y">
                             @foreach($event->registrations as $r)
@@ -52,7 +54,31 @@
                                 <td class="px-4 py-3 font-medium text-gray-800">{{ $r->name }}</td>
                                 <td class="px-4 py-3 text-gray-500">{{ $r->email }}</td>
                                 <td class="px-4 py-3 text-gray-500">{{ $r->phone }}</td>
+                                @php $regColors = ['approved'=>'bg-green-100 text-green-700','pending'=>'bg-yellow-100 text-yellow-700','rejected'=>'bg-red-100 text-red-700']; @endphp
+                                <td class="px-4 py-3">
+                                    <span class="px-3 py-1 rounded-full text-sm font-semibold {{ $regColors[$r->status] ?? 'bg-gray-100 text-gray-700' }}">
+                                        {{ ucfirst($r->status) }}
+                                    </span>
+                                </td>
                                 <td class="px-4 py-3 text-gray-400">{{ $r->created_at->format('d/m/Y H:i') }}</td>
+                                <td class="px-4 py-3">
+                                    <form method="POST" action="{{ route('admin.events.registrations.status', [$event, $r]) }}" class="space-y-2">
+                                        @csrf @method('PATCH')
+                                        <div class="relative">
+                                            <select name="status" class="w-full appearance-none rounded-2xl border border-gray-200 bg-white py-3 pl-4 pr-10 text-sm font-semibold text-gray-700 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                                                <option value="approved" {{ $r->status=='approved'?'selected':'' }}>✅ Approved</option>
+                                                <option value="pending" {{ $r->status=='pending'?'selected':'' }}>⏳ Pending</option>
+                                                <option value="rejected" {{ $r->status=='rejected'?'selected':'' }}>❌ Rejected</option>
+                                            </select>
+                                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-2xl text-sm font-semibold hover:bg-blue-700 transition">
+                                            Simpan Perubahan
+                                        </button>
+                                    </form>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -86,13 +112,18 @@
             <h3 class="font-bold text-gray-800 mb-4">Update Status</h3>
             <form method="POST" action="{{ route('admin.events.status', $event) }}" class="space-y-3">
                 @csrf @method('PATCH')
-                <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="approved" {{ $event->status=='approved'?'selected':'' }}>✅ Approved</option>
-                    <option value="pending" {{ $event->status=='pending'?'selected':'' }}>⏳ Pending</option>
-                    <option value="rejected" {{ $event->status=='rejected'?'selected':'' }}>❌ Rejected</option>
-                </select>
-                <button type="submit" class="w-full bg-blue-600 text-white py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition text-sm">
-                    Simpan Status
+                <div class="relative">
+                    <select name="status" class="w-full appearance-none rounded-2xl border border-gray-200 bg-white py-3 pl-4 pr-10 text-sm font-semibold text-gray-700 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                        <option value="approved" {{ $event->status=='approved'?'selected':'' }}>✅ Approved</option>
+                        <option value="pending" {{ $event->status=='pending'?'selected':'' }}>⏳ Pending</option>
+                        <option value="rejected" {{ $event->status=='rejected'?'selected':'' }}>❌ Rejected</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-2xl text-sm font-semibold hover:bg-blue-700 transition">
+                    Simpan Perubahan
                 </button>
             </form>
         </div>

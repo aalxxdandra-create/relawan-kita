@@ -37,4 +37,5 @@ Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(func
     Route::put('/events/{event}', [AdminEventController::class, 'update'])->name('events.update');
     Route::delete('/events/{event}', [AdminEventController::class, 'destroy'])->name('events.destroy');
     Route::patch('/events/{event}/status', [AdminEventController::class, 'updateStatus'])->name('events.status');
+    Route::patch('/events/{event}/registrations/{registration}/status', [AdminEventController::class, 'updateRegistrationStatus'])->name('events.registrations.status');
 });

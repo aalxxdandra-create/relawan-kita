@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Registration;
 use Illuminate\Http\Request;
 
 class AdminEventController extends Controller {
@@ -28,7 +29,7 @@ class AdminEventController extends Controller {
     }
 
     public function show(Event $event) {
-        $event->load('registrations','user');
+        $event->load(['registrations' => fn($query) => $query->latest(), 'user']);
         return view('admin.events.show', compact('event'));
     }
 
@@ -80,6 +81,16 @@ class AdminEventController extends Controller {
         $request->validate(['status' => 'required|in:approved,rejected,pending']);
         $event->update(['status' => $request->status]);
         $msgs = ['approved'=>'Event disetujui!','rejected'=>'Event ditolak.','pending'=>'Status dikembalikan ke pending.'];
+        return redirect()->back()->with('success', $msgs[$request->status]);
+    }
+
+    public function updateRegistrationStatus(Request $request, Event $event, Registration $registration) {
+        if ($registration->event_id !== $event->id) {
+            abort(404);
+        }
+        $request->validate(['status' => 'required|in:approved,rejected,pending']);
+        $registration->update(['status' => $request->status]);
+        $msgs = ['approved'=>'Pendaftar disetujui!','rejected'=>'Pendaftar ditolak.','pending'=>'Status pendaftaran dikembalikan ke pending.'];
         return redirect()->back()->with('success', $msgs[$request->status]);
     }
 }

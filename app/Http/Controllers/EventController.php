@@ -70,7 +70,7 @@ class EventController extends Controller {
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
         ]);
-        Registration::create(['event_id'=>$event->id] + $validated);
+        Registration::create(['event_id'=>$event->id, 'status' => 'pending'] + $validated);
         return response()->json(['success'=>true,'message'=>'Pendaftaran berhasil! Penyelenggara akan menghubungi Anda.']);
     }
 }
