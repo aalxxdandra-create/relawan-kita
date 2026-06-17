@@ -46,6 +46,12 @@
                 </div>
             </div>
 
+            <div class="flex items-center gap-2 mb-4 text-xs text-gray-500">
+                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>Pending</span>
+                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>Rejected</span>
+                <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>Accepted</span>
+            </div>
+
             @if($event->registrations->isNotEmpty())
                 <div class="space-y-4">
                     @foreach($event->registrations as $r)
@@ -57,6 +63,7 @@
                                     <p class="text-sm text-gray-600">{{ $r->email }} · {{ $r->phone }}</p>
                                 </div>
                                 <div class="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold {{ $regColors[$r->status] ?? 'bg-gray-100 text-gray-700' }}">
+                                    <span class="w-2 h-2 rounded-full mr-2 {{ $r->status==='approved' ? 'bg-green-500' : ($r->status==='rejected' ? 'bg-red-500' : 'bg-yellow-400') }}"></span>
                                     {{ ucfirst($r->status) }}
                                 </div>
                             </div>
@@ -64,22 +71,24 @@
                                 <div class="text-sm text-gray-500">
                                     <p>Daftar: <span class="font-semibold text-gray-900">{{ $r->created_at->format('d/m/Y H:i') }}</span></p>
                                 </div>
-                                <form method="POST" action="{{ route('admin.events.registrations.status', [$event, $r]) }}" class="grid gap-3 sm:grid-cols-[1fr_auto]">
-                                    @csrf @method('PATCH')
-                                    <div class="relative">
-                                        <select name="status" class="w-full rounded-2xl border border-gray-300 bg-white py-3 pl-4 pr-10 text-sm font-semibold text-gray-700 shadow-sm outline-none transition duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
-                                            <option value="approved" {{ $r->status=='approved'?'selected':'' }}>✅ Approved</option>
-                                            <option value="pending" {{ $r->status=='pending'?'selected':'' }}>⏳ Pending</option>
-                                            <option value="rejected" {{ $r->status=='rejected'?'selected':'' }}>❌ Rejected</option>
-                                        </select>
-                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
-                                            <i class="fas fa-chevron-down"></i>
+                                @if(auth()->user()->isDeveloper())
+                                    <form method="POST" action="{{ route('admin.events.registrations.status', [$event, $r]) }}" class="grid gap-3 sm:grid-cols-[1fr_auto]">
+                                        @csrf @method('PATCH')
+                                        <div class="relative">
+                                            <select name="status" class="w-full rounded-2xl border border-gray-300 bg-white py-3 pl-4 pr-10 text-sm font-semibold text-gray-700 shadow-sm outline-none transition duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                                                <option value="approved" {{ $r->status=='approved'?'selected':'' }}>✅ Approved</option>
+                                                <option value="pending" {{ $r->status=='pending'?'selected':'' }}>⏳ Pending</option>
+                                                <option value="rejected" {{ $r->status=='rejected'?'selected':'' }}>❌ Rejected</option>
+                                            </select>
+                                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <button type="submit" class="w-full rounded-3xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition duration-200">
-                                        Simpan
-                                    </button>
-                                </form>
+                                        <button type="submit" class="w-full rounded-3xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition duration-200">
+                                            Simpan
+                                        </button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     @endforeach
@@ -107,26 +116,28 @@
             </div>
         </div>
 
-        {{-- Update Status --}}
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-200 p-8">
-            <h3 class="font-bold text-gray-800 mb-5 text-lg">Update Status</h3>
-            <form method="POST" action="{{ route('admin.events.status', $event) }}" class="space-y-3">
-                @csrf @method('PATCH')
-                <div class="relative">
-                    <select name="status" class="w-full appearance-none rounded-2xl border border-gray-200 bg-white py-3 pl-4 pr-10 text-sm font-semibold text-gray-700 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
-                        <option value="approved" {{ $event->status=='approved'?'selected':'' }}>✅ Approved</option>
-                        <option value="pending" {{ $event->status=='pending'?'selected':'' }}>⏳ Pending</option>
-                        <option value="rejected" {{ $event->status=='rejected'?'selected':'' }}>❌ Rejected</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
-                        <i class="fas fa-chevron-down"></i>
+        @if(auth()->user()->isDeveloper())
+            {{-- Update Status --}}
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-200 p-8">
+                <h3 class="font-bold text-gray-800 mb-5 text-lg">Update Status</h3>
+                <form method="POST" action="{{ route('admin.events.status', $event) }}" class="space-y-3">
+                    @csrf @method('PATCH')
+                    <div class="relative">
+                        <select name="status" class="w-full appearance-none rounded-2xl border border-gray-200 bg-white py-3 pl-4 pr-10 text-sm font-semibold text-gray-700 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                            <option value="approved" {{ $event->status=='approved'?'selected':'' }}>✅ Approved</option>
+                            <option value="pending" {{ $event->status=='pending'?'selected':'' }}>⏳ Pending</option>
+                            <option value="rejected" {{ $event->status=='rejected'?'selected':'' }}>❌ Rejected</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
                     </div>
-                </div>
-                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-2xl text-sm font-semibold hover:bg-blue-700 transition">
-                    Simpan Perubahan
-                </button>
-            </form>
-        </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-2xl text-sm font-semibold hover:bg-blue-700 transition">
+                        Simpan Perubahan
+                    </button>
+                </form>
+            </div>
+        @endif
     </div>
 </div>
 @endsection

@@ -161,11 +161,17 @@ document.getElementById('volunteerForm').addEventListener('submit', async functi
         if (result.success) {
             status.className = 'mb-4 p-4 rounded-xl text-sm font-medium bg-green-50 text-green-700 border border-green-200';
             status.innerHTML = '✅ ' + result.message;
+            if (typeof showToast === 'function') {
+                showToast('success', result.message);
+            }
             this.reset();
             setTimeout(closeModal, 3000);
         } else {
             status.className = 'mb-4 p-4 rounded-xl text-sm font-medium bg-red-50 text-red-700 border border-red-200';
             status.innerHTML = '❌ ' + (result.message || 'Terjadi kesalahan.');
+            if (typeof showToast === 'function') {
+                showToast('error', result.message || 'Terjadi kesalahan.');
+            }
         }
     } catch(err) {
         status.classList.remove('hidden');

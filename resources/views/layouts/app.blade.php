@@ -64,26 +64,18 @@
         </div>
     </nav>
 
+    <div id="toastContainer" class="fixed top-4 right-4 z-[999] flex flex-col gap-2"></div>
+
     {{-- FLASH MESSAGES --}}
     @if(session('success'))
-        <div class="max-w-7xl mx-auto w-full px-4 mt-4">
-            <div class="bg-green-50 border-l-4 border-green-500 text-green-800 px-4 py-3 rounded-lg flex items-center justify-between">
-                <span><i class="fas fa-check-circle mr-2"></i>{{ session('success') }}</span>
-                <button onclick="this.parentElement.parentElement.remove()" class="text-green-700 hover:text-green-900"><i class="fas fa-times"></i></button>
-            </div>
-        </div>
+        <div class="hidden" data-toast="success" data-message="{{ session('success') }}"></div>
     @endif
     @if(session('error'))
-        <div class="max-w-7xl mx-auto w-full px-4 mt-4">
-            <div class="bg-red-50 border-l-4 border-red-500 text-red-800 px-4 py-3 rounded-lg flex items-center justify-between">
-                <span><i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}</span>
-                <button onclick="this.parentElement.parentElement.remove()" class="text-red-700 hover:text-red-900"><i class="fas fa-times"></i></button>
-            </div>
-        </div>
+        <div class="hidden" data-toast="error" data-message="{{ session('error') }}"></div>
     @endif
 
     {{-- CONTENT --}}
-    <main class="flex-grow">
+    <main class="grow">
         @yield('content')
     </main>
 
@@ -100,8 +92,21 @@
     </footer>
 
     <script>
+        function showToast(type, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const isError = type === 'error';
+            toast.className = `max-w-sm w-full rounded-2xl border px-4 py-3 shadow-lg text-sm font-medium ${isError ? 'bg-red-50 border-red-200 text-red-700' : 'bg-green-50 border-green-200 text-green-700'}`;
+            toast.innerHTML = `<div class="flex items-center justify-between gap-3"><span><i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'} mr-2"></i>${message}</span><button class="text-current opacity-70 hover:opacity-100" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button></div>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { document.body.style.opacity = '1'; }, 50);
+            document.querySelectorAll('[data-toast]').forEach(el => {
+                showToast(el.dataset.toast, el.dataset.message);
+            });
         });
     </script>
     @stack('scripts')

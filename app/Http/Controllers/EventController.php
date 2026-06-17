@@ -53,12 +53,12 @@ class EventController extends Controller {
             'image_url'    => 'nullable|url|max:500',
         ]);
         $validated['user_id'] = auth()->id();
-        $validated['status']  = auth()->user()->isAdmin() ? 'approved' : 'pending';
+        $validated['status']  = 'pending';
         Event::create($validated);
-        $msg = auth()->user()->isAdmin()
-            ? 'Event berhasil ditambahkan!'
-            : 'Pengajuan berhasil dikirim! Admin akan meninjau dalam 1x24 jam.';
-        return redirect()->route('events.index')->with('success', $msg);
+        return redirect()->route('events.index')->with(
+            'success',
+            'Pengajuan event berhasil dikirim. Event akan ditinjau sebelum ditampilkan ke publik.'
+        );
     }
 
     public function register(Request $request, Event $event) {

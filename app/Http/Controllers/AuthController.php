@@ -42,20 +42,24 @@ class AuthController extends Controller {
     public function register(Request $request) {
         $validated = $request->validate([
             'name'     => 'required|string|max:100',
-            'email'    => ['required','email','unique:users,email','regex:/^[^@]+@(gmail\.com|relawankita\.com)$/i'],
+            'email'    => ['required','email','unique:users,email','regex:/^[^@]+@(gmail\.com|relawankita\.com|developer\.com)$/i'],
             'password' => 'required|min:6|confirmed',
         ], [
             'name.required'      => 'Nama wajib diisi.',
             'email.required'     => 'Email wajib diisi.',
             'email.email'        => 'Format email tidak valid.',
             'email.unique'       => 'Email sudah terdaftar.',
-            'email.regex'        => 'Email harus menggunakan domain @gmail.com untuk user atau @relawankita.com untuk admin.',
+            'email.regex'        => 'Email harus menggunakan domain @gmail.com untuk user, @relawankita.com untuk admin, atau @developer.com untuk developer.',
             'password.min'       => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
         $domain = Str::lower(Str::after($validated['email'], '@'));
-        $role = $domain === 'relawankita.com' ? 'admin' : 'user';
+        $role = match ($domain) {
+            'developer.com' => 'developer',
+            'relawankita.com' => 'admin',
+            default => 'user',
+        };
 
         $user = User::create([
             'name'     => $validated['name'],
@@ -77,8 +81,14 @@ class AuthController extends Controller {
     }
 
     private function redirectByRole() {
-        return Auth::user()->isAdmin()
-            ? redirect()->route('admin.events.index')
-            : redirect()->route('home');
+        if (Auth::user()->isDeveloper()) {
+            return redirect()->route('developer.dashboard');
+        }
+
+        if (Auth::user()->isAdmin()) {
+            return redirect()->route('admin.events.index');
+        }
+
+        return redirect()->route('home');
     }
 }

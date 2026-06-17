@@ -5,11 +5,12 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminMiddleware {
+class DeveloperMiddleware {
     public function handle(Request $request, Closure $next): Response {
-        if (!auth()->check() || !auth()->user()->isAdminOrDeveloper()) {
-            abort(403, 'Akses ditolak. Hanya admin/developer yang diizinkan.');
+        if (!auth()->check() || !auth()->user()->isDeveloper()) {
+            abort(403, 'Akses ditolak. Hanya developer yang diizinkan.');
         }
+
         return $next($request);
     }
 }

@@ -26,9 +26,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-// ADMIN ONLY
+// DEVELOPER ONLY
+Route::middleware(['auth','developer'])->prefix('developer')->name('developer.')->group(function () {
+    Route::get('/dashboard', [AdminEventController::class, 'developerDashboard'])->name('dashboard');
+});
+
+// ADMIN / DEVELOPER ONLY
 Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', fn() => redirect()->route('admin.events.index'))->name('dashboard');
+    Route::get('/', fn() => auth()->user()->isDeveloper()
+        ? redirect()->route('developer.dashboard')
+        : redirect()->route('admin.events.index'))
+        ->name('dashboard');
     Route::get('/events', [AdminEventController::class, 'index'])->name('events.index');
     Route::get('/events/create', [AdminEventController::class, 'create'])->name('events.create');
     Route::post('/events', [AdminEventController::class, 'store'])->name('events.store');
@@ -36,6 +44,9 @@ Route::middleware(['auth','admin'])->prefix('admin')->name('admin.')->group(func
     Route::get('/events/{event}/edit', [AdminEventController::class, 'edit'])->name('events.edit');
     Route::put('/events/{event}', [AdminEventController::class, 'update'])->name('events.update');
     Route::delete('/events/{event}', [AdminEventController::class, 'destroy'])->name('events.destroy');
+});
+
+Route::middleware(['auth','developer'])->prefix('admin')->name('admin.')->group(function () {
     Route::patch('/events/{event}/status', [AdminEventController::class, 'updateStatus'])->name('events.status');
     Route::patch('/events/{event}/registrations/{registration}/status', [AdminEventController::class, 'updateRegistrationStatus'])->name('events.registrations.status');
 });

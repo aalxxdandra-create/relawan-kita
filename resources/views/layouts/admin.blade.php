@@ -23,6 +23,11 @@
             </div>
 
             <nav class="flex-1 p-4 space-y-1">
+                @if(auth()->user()->isDeveloper())
+                    <a href="{{ route('developer.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition {{ request()->routeIs('developer.dashboard') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800' }}">
+                        <i class="fas fa-tachometer-alt w-5"></i> Dashboard Developer
+                    </a>
+                @endif
                 <a href="{{ route('admin.events.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition {{ request()->routeIs('admin.events.*') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800' }}">
                     <i class="fas fa-calendar-alt w-5"></i> Kelola Event
                 </a>
@@ -38,7 +43,7 @@
                     </div>
                     <div>
                         <p class="text-sm font-semibold text-white truncate">{{ auth()->user()->name }}</p>
-                        <p class="text-xs text-gray-400">Administrator</p>
+                        <p class="text-xs text-gray-400">{{ auth()->user()->isDeveloper() ? 'Developer' : 'Administrator' }}</p>
                     </div>
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
@@ -57,17 +62,13 @@
                 <span class="text-sm text-gray-500">{{ now()->format('d F Y') }}</span>
             </header>
 
+            <div id="toastContainer" class="fixed top-4 right-4 z-[999] flex flex-col gap-2"></div>
+
             @if(session('success'))
-                <div class="mx-8 mt-4 bg-green-50 border-l-4 border-green-500 text-green-800 px-4 py-3 rounded-2xl shadow-sm flex items-center justify-between">
-                    <span><i class="fas fa-check-circle mr-2"></i>{{ session('success') }}</span>
-                    <button onclick="this.parentElement.remove()" class="text-green-800 hover:text-green-900"><i class="fas fa-times"></i></button>
-                </div>
+                <div class="hidden" data-toast="success" data-message="{{ session('success') }}"></div>
             @endif
             @if(session('error'))
-                <div class="mx-8 mt-4 bg-red-50 border-l-4 border-red-500 text-red-800 px-4 py-3 rounded-2xl shadow-sm flex items-center justify-between">
-                    <span><i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}</span>
-                    <button onclick="this.parentElement.remove()" class="text-red-800 hover:text-red-900"><i class="fas fa-times"></i></button>
-                </div>
+                <div class="hidden" data-toast="error" data-message="{{ session('error') }}"></div>
             @endif
 
             <main class="flex-1 p-10 max-w-7xl mx-auto">
@@ -77,8 +78,21 @@
     </div>
 
     <script>
+        function showToast(type, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const isError = type === 'error';
+            toast.className = `max-w-sm w-full rounded-2xl border px-4 py-3 shadow-lg text-sm font-medium ${isError ? 'bg-red-50 border-red-200 text-red-700' : 'bg-green-50 border-green-200 text-green-700'}`;
+            toast.innerHTML = `<div class="flex items-center justify-between gap-3"><span><i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'} mr-2"></i>${message}</span><button class="text-current opacity-70 hover:opacity-100" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button></div>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { document.body.style.opacity = '1'; }, 50);
+            document.querySelectorAll('[data-toast]').forEach(el => {
+                showToast(el.dataset.toast, el.dataset.message);
+            });
         });
     </script>
     @stack('scripts')
